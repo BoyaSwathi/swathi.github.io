@@ -1,0 +1,84 @@
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Assignment for a Frontend AngularJs Developer</title>
+      <script type="text/javascript" src="angular.min.js"></script>
+      <script type="text/javascript" src="highcharts.js"></script>
+      <style type="text/css">body{padding:0px 10px;margin:0px;}p{text-align:center;}table{width: 100%;text-align: center;border: 1px solid black;}tr:nth-child(odd){background: #e0edfa;}
+      </style>
+   </head>
+   <body ng-app="myApp">
+      <div ng-controller="myController">
+         <div id="container"></div>
+         <table>
+            <tr style="background: #1e90ff;color: white;">
+               <th>Name</th>
+               <th>Price in USD</th>
+               <th>Price in BTC</th>
+               <th>Percentage change in 7 days</th>
+               <th>Last Updated</th>
+            </tr>
+            <tr ng-repeat="x in myData">
+               <td>{{ x.name }}</td>
+               <td>{{ x.price_usd }}</td>
+               <td>{{ x.price_btc }}</td>
+               <td>{{ x.percent_change_7d }}</td>
+               <td>{{ x.last_updated }}</td>
+            </tr>
+         </table>
+      </div>
+      <marquee>Note:It will refresh the data after every 5 minutes</marquee>
+      <script>
+         var myApp=angular.module("myApp",[]);
+         myApp.controller('myController',function($scope,$http,$filter,$interval){   
+              $scope.refreshData = function(){ 
+                 $http.get("https://api.coinmarketcap.com/v1/ticker/?limit=10",{headers: {'Content-Type':'application/json; charset=UTF-8'}}).then(function (response) {
+                     $scope.myData=response.data;
+                     console.log($scope.myData);
+                     $scope.name=[]; 
+                     $scope.usd=[];
+                     for(i=0;i<$scope.myData.length;i++){
+                         $scope.name.push($scope.myData[i].symbol+"<br>("+$scope.myData[i].name+")");
+                         $scope.usd.push(parseFloat($scope.myData[i].price_usd));
+                     }
+                     var myChart = Highcharts.chart('container', {
+                         chart: {
+                              height: 500,
+                             type: 'column'
+                         },
+                         title: {
+                             text: 'Exchange Rate of all Crypto Currencies in USD'
+                         },
+         
+                         tooltip: {
+                             formatter: function() {
+                                 return this.x +" "+this.series.name + ": <b>" + this.y  +"</b>"
+                             }
+                         },
+                         xAxis: {
+                             categories: $scope.name
+                         },
+                         yAxis: {
+                             title: {
+                                 text: 'Exchange rate in USD'
+                             }
+                         },
+                         credits: {
+                             enabled: false
+                         },
+                         series: [{
+                             name: 'Price in USD',
+                             data:  $scope.usd
+                         }]
+                     });
+         
+                 });
+             };
+             $scope.refreshData();
+             $interval($scope.refreshData, 300000);         
+         });
+      </script>
+   </body>
+</html>
