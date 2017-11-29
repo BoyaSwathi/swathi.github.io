@@ -10,3 +10,7 @@
 * NodeJs/ExpressJs for running server
 * AngularJs 1.x for collecting the data from Apis and displyaing views
 * D3.js or Charts.js or any other library for rendering charts
+
+## Technologies I have used
+* AngularJS v1.6.4 for collecting the data from Apis and displyaing views.
+* Highcharts JS v6.0.3 for rendering bar chart.
